@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+transformers==4.50.0
+datasets==3.4.1
+pydantic
