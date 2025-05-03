@@ -1,7 +1,7 @@
 import sys
 import os
 import argparse
-from transformers import AutoModel, AutoTokenizer, AutoConfig, T5ForConditionalGeneration
+from transformers import AutoConfig, T5ForConditionalGeneration
 
 
 def download_model(model_name, save_dir=None, use_auth_token=None):
@@ -24,16 +24,6 @@ def download_model(model_name, save_dir=None, use_auth_token=None):
         config = AutoConfig.from_pretrained(model_name, use_auth_token=use_auth_token)
         print("모델 설정 다운로드 완료")
 
-        # 토크나이저 다운로드
-        print("토크나이저 다운로드 중...")
-        try:
-            tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=use_auth_token)
-            print("토크나이저 다운로드 완료")
-        except Exception as e:
-            print(f"토크나이저 다운로드 실패: {e}")
-            print("일부 모델은 토크나이저가 없을 수 있습니다. 계속 진행합니다.")
-            tokenizer = None
-
         # 모델 다운로드
         print("모델 가중치 다운로드 중... (대용량 파일이므로 시간이 걸릴 수 있습니다)")
         model = T5ForConditionalGeneration.from_pretrained(model_name, use_auth_token=use_auth_token)
@@ -50,10 +40,6 @@ def download_model(model_name, save_dir=None, use_auth_token=None):
 
             config.save_pretrained(model_path)
             print("설정 저장 완료")
-
-            if tokenizer:
-                tokenizer.save_pretrained(model_path)
-                print("토크나이저 저장 완료")
 
             model.save_pretrained(model_path)
             print("모델 가중치 저장 완료")
