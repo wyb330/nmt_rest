@@ -27,11 +27,11 @@ logger.setLevel(logging.DEBUG)  # 로거 레벨 설정
 log_path = './logs'
 os.makedirs(log_path, exist_ok=True)
 file_handler = logging.FileHandler(os.path.join(log_path, 'nmt.log'), mode='a', encoding='utf8')
-file_handler.setLevel(logging.DEBUG)  # 핸들러 레벨 설정
+file_handler.setLevel(logging.INFO)  # 핸들러 레벨 설정
 
 # 핸들러 생성 및 설정
 console_handler = logging.StreamHandler()  # 콘솔 출력용
-console_handler.setLevel(logging.DEBUG)
+console_handler.setLevel(logging.INFO)
 
 # 포맷터 생성 및 핸들러에 연결
 formatter = logging.Formatter('%(asctime)s \n%(message)s')

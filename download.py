@@ -1,7 +1,7 @@
 import sys
 import os
 import argparse
-from transformers import AutoModel, AutoTokenizer, AutoConfig
+from transformers import AutoModel, AutoTokenizer, AutoConfig, T5ForConditionalGeneration
 
 
 def download_model(model_name, save_dir=None, use_auth_token=None):
@@ -36,7 +36,7 @@ def download_model(model_name, save_dir=None, use_auth_token=None):
 
         # 모델 다운로드
         print("모델 가중치 다운로드 중... (대용량 파일이므로 시간이 걸릴 수 있습니다)")
-        model = AutoModel.from_pretrained(model_name, use_auth_token=use_auth_token)
+        model = T5ForConditionalGeneration.from_pretrained(model_name, use_auth_token=use_auth_token)
         print("모델 가중치 다운로드 완료")
 
         # 모델 저장 (지정된 경로가 있을 경우)
@@ -72,7 +72,7 @@ def download_model(model_name, save_dir=None, use_auth_token=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Hugging Face 모델 다운로더')
     parser.add_argument('model_name', type=str, help='다운로드할 Hugging Face 모델 이름')
-    parser.add_argument('--save_dir', type=str, default=None, help='모델을 저장할 디렉토리 경로')
+    parser.add_argument('--save_dir', type=str, default='./models', help='모델을 저장할 디렉토리 경로')
     parser.add_argument('--token', type=str, default=None, help='Hugging Face 인증 토큰 (비공개 모델용)')
 
     args = parser.parse_args()
