@@ -20,6 +20,8 @@
 
   setup_gpu.bat : Nvidia GPU를 이용해서 번역 서비스를 하는 경우
 
+  번역 모델을 직접 다운로드 받으려면 https://huggingface.co/Darong/BlueT 에서 받을 수 있습니다.
+
 ### 실행
 
 ```commandline
