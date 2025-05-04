@@ -19,28 +19,40 @@ tokenizer = T5TokenizerFast.from_pretrained(tokenizer_name)
 
 app = FastAPI()
 
+
 # 로거 생성
-logger = logging.getLogger('nmt')
-logger.setLevel(logging.DEBUG)  # 로거 레벨 설정
+def setting_log(log_level='info'):
+    logger = logging.getLogger('nmt')
+    if log_level == 'debug':
+        level = logging.DEBUG
+    elif log_level == 'info':
+        level = logging.INFO
+    elif log_level == 'warning':
+        level = logging.WARNING
+    else:
+        level = logging.ERROR
+    logger.setLevel(level)  # 로거 레벨 설정
 
-# 파일 핸들러 생성
-log_path = './logs'
-os.makedirs(log_path, exist_ok=True)
-file_handler = logging.FileHandler(os.path.join(log_path, 'nmt.log'), mode='a', encoding='utf8')
-file_handler.setLevel(logging.INFO)  # 핸들러 레벨 설정
+    # 파일 핸들러 생성
+    log_path = './logs'
+    os.makedirs(log_path, exist_ok=True)
+    file_handler = logging.FileHandler(os.path.join(log_path, 'nmt.log'), mode='a', encoding='utf8')
+    file_handler.setLevel(level)  # 핸들러 레벨 설정
 
-# 핸들러 생성 및 설정
-console_handler = logging.StreamHandler()  # 콘솔 출력용
-console_handler.setLevel(logging.INFO)
+    # 핸들러 생성 및 설정
+    console_handler = logging.StreamHandler()  # 콘솔 출력용
+    console_handler.setLevel(level)
 
-# 포맷터 생성 및 핸들러에 연결
-formatter = logging.Formatter('%(asctime)s \n%(message)s')
-file_handler.setFormatter(formatter)
-console_handler.setFormatter(formatter)
+    # 포맷터 생성 및 핸들러에 연결
+    formatter = logging.Formatter('%(asctime)s \n%(message)s')
+    file_handler.setFormatter(formatter)
+    console_handler.setFormatter(formatter)
 
-# 로거에 핸들러 추가
-logger.addHandler(console_handler)
-logger.addHandler(file_handler)
+    # 로거에 핸들러 추가
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+
+    return logger
 
 
 class TranslationInput(BaseModel):
@@ -110,7 +122,7 @@ def translate_sents(prompt, sents):
 
 
 @app.post("/translate", response_model=TranslatedText)
-def translate_text(input_data: TranslationInput):
+async def translate_text(input_data: TranslationInput):
 
     def add_result(inputs):
         ts = translate_sents(prompt, inputs)
@@ -162,7 +174,7 @@ def translate_text(input_data: TranslationInput):
 
 
 @app.post("/pdf", response_model=TranslatedText)
-def translate_pdf(input_data: TranslationInput):
+async def translate_pdf(input_data: TranslationInput):
 
     def add_result(inputs):
         ts = translate_sents(prompt, inputs)
@@ -214,7 +226,7 @@ def translate_pdf(input_data: TranslationInput):
 
 
 @app.post("/subtitle", response_model=SubtitleOutput)
-def translate_subtitle(input_data: SubtitleInput):
+async def translate_subtitle(input_data: SubtitleInput):
     filename = input_data.filename
     if not os.path.exists(filename):
         return SubtitleOutput(output='', error='자막 파일이 존재하지 않습니다.')
@@ -249,8 +261,10 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--port', type=int, default=5000)
     parser.add_argument('-m', '--model', type=str, default='./models/BlueT')
     parser.add_argument('-b', '--batch', type=int, default=8)
+    parser.add_argument('-l', '--log_level', type=str, default='info')
     args = parser.parse_args()
     model_path = args.model
+    logger = setting_log(args.log_level)
     if not os.path.exists(model_path):
         logger.error(f"{model_path}가 존재하지 않습니다.")
         raise ValueError(f"{model_path}가 존재하지 않습니다.")
