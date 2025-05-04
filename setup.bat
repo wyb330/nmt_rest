@@ -47,6 +47,7 @@ if exist requirements.txt (
 ) 
 
 echo Download model...
+mkdir models
 uv run download.py "Darong/BlueT" --save_dir models
 
 REM 角青 颇老 积己

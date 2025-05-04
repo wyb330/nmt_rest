@@ -48,60 +48,61 @@ echo Adding CUDA to system PATH...
 setx PATH "%PATH%;%CUDA_PATH%\bin" /M
 
 
-REM Pythonï¿½ï¿½ ï¿½Ì¹ï¿½ ï¿½ï¿½Ä¡ï¿½Ç¾ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
+REM PythonÀÌ ÀÌ¹Ì ¼³Ä¡µÇ¾î ÀÖ´ÂÁö È®ÀÎ
 python --version >nul 2>&1
 if %errorlevel% equ 0 (
     echo Python is already installed.
 ) else (
     echo Python is not installed, start installation...
     
-    REM Python ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¿ï¿½Îµï¿½
+    REM Python ¼³Ä¡ ÆÄÀÏ ´Ù¿î·Îµå
     echo Download Python installation file...
     curl -L -o python_installer.exe https://www.python.org/ftp/python/3.11.5/python-3.11.5-amd64.exe
     
-    REM Python ï¿½ï¿½Ä¡ (ï¿½âº» ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½Ä¡, PATHï¿½ï¿½ ï¿½ß°ï¿½)
+    REM Python ¼³Ä¡ (±âº» °æ·Î¿¡ ¼³Ä¡, PATH¿¡ Ãß°¡)
     echo Install Python...
     start /wait python_installer.exe /quiet InstallAllUsers=1 PrependPath=1 Include_pip=1
     
-    REM ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    REM ¼³Ä¡ ÆÄÀÏ »èÁ¦
     del python_installer.exe
     
     echo Python installation is complete.
 )
 
-REM UV ï¿½ï¿½Ä¡
+REM UV ¼³Ä¡
 echo Install UV...
 curl -L -o install-uv.ps1 https://astral.sh/uv/install.ps1
 powershell -ExecutionPolicy Bypass -File install-uv.ps1
 del install-uv.ps1
 
-REM UV PATH ï¿½ï¿½ï¿½ï¿½ (ï¿½Ï¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ %USERPROFILE%\.cargo\bin ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½)
+REM UV PATH ¼³Á¤ (ÀÏ¹İÀûÀ¸·Î %USERPROFILE%\.cargo\bin °æ·Î¿¡ ¼³Ä¡µÊ)
 set PATH=%PATH%;%USERPROFILE%\.cargo\bin
 echo UV installation is complete.
 
-REM UVï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½È¯ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+REM UV¸¦ ÀÌ¿ëÇÑ °¡»óÈ¯°æ »ı¼º
 echo Create Python virtual environments with UV...
 uv venv .venv
 
-REM ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìºê·¯ï¿½ï¿½ ï¿½ï¿½Ä¡
+REM ÇÊ¿äÇÑ ¶óÀÌºê·¯¸® ¼³Ä¡
 echo Install the required library...
 
 uv pip install torch --index-url https://download.pytorch.org/whl/cu124
 
-REM requirements.txt ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
+REM requirements.txt ÆÄÀÏÀÌ Á¸ÀçÇÏ´ÂÁö È®ÀÎ
 if exist requirements.txt (
     uv pip install -r requirements.txt
     echo Library installation has been completed.
 ) 
 
 echo Download model...
-echo uv run download.py "Darong/BlueT" --save_dir models
+mkdir models
+uv run download.py "Darong/BlueT" --save_dir models
 
-REM ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+REM ½ÇÇà ÆÄÀÏ »ı¼º
 echo ====================================
 echo Create a program executable...
 
-REM run.bat ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½Î±×·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½)
+REM run.bat ÆÄÀÏ »ı¼º (ÇÁ·Î±×·¥ ½ÇÇà¿ë)
 echo @echo off > run.bat
 echo uv run server.py  >> run.bat
 echo pause >> run.bat
